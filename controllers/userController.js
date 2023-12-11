@@ -39,11 +39,34 @@ const registerUser = asyncHandler(async (req, res) => {
 //@route POST /api/users/login
 //@access public
 const loginUser = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
+  
+    const requiredFields = ["email", "password"];
+
+    const missingFields = [];
+
+    requiredFields.forEach((field) => {
+      if (!req.body[field]) {
+        missingFields.push(field);
+      }
+    });
+
+    if (missingFields.length > 0) {
       res.status(400);
-      throw new Error("All fields are mandatory!");
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+
+      // res.status(400).json({
+      //   message: "Provide The User Email & Password",
+      //   missingFields: missingFields,
+      // });
+      // return;
     }
+
+    // if (!email || !password) {
+    //   res.status(400);
+    //   throw new Error("All fields are mandatory!");
+    // }
+
+    const { email, password } = req.body;
 
     const user = await User.findOne({ email });
 
